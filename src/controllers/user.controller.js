@@ -421,6 +421,10 @@ const channel = await user.aggregate([
       throw new ApiError(400,"video file is required")
     }
 
+    res.status(200).json(
+      new ApiResponce(200,uploadVideo,"video file upload successfully")
+    )
+
     })
 export { registerUser, loginUser,logoutUser,refreshaccessToken,changecurrentPassword,currentUser,updateuserDetail,updatecoverImage,updateAvatar,getUserChannelProfile,getWatchHistory,videofile }
 

@@ -130,7 +130,7 @@ const logoutUser = asyncHandler(async (req,res) => {
  await user.findByIdAndUpdate(
   req.user._id, {
     $set: {
-      refreshToken:undefined
+      refreshToken:null
     }
   },
   {
@@ -149,7 +149,7 @@ return res.status(200).clearCookie("accessToken",options).clearCookie("refreshTo
 
 const refreshaccessToken = asyncHandler(async (req,res) => {
 
-const incomingTokenAccess = req.cookie.refreshToken || req.body.refreshToken
+const incomingTokenAccess = req.cookies.refreshToken || req.body.refreshToken
 
 if(!incomingTokenAccess){
   throw new ApiError(401,"unauthorized token")
@@ -164,21 +164,30 @@ if(!userValid){
   throw new ApiError(500,"unauthorized user")
 }
 
-if(incomingTokenAccess !== userValid){
+console.log("Incoming:", incomingTokenAccess);
+console.log("Stored:", userValid.refreshToken);
+
+
+if(incomingTokenAccess !== userValid.refreshToken){
   throw new ApiError(400,"refresh token is expired")
 }
+
+const {refreshToken:newRefreshToken,accessToken} = await generateAcesstokenandRefreshtoken(userValid._id)
+
+userValid.refreshToken = newRefreshToken
+await userValid.save()
+console.log("DB after save:", userValid.refreshToken);
+
 
 const options = {
   httpOnly:true,
   secure:true
 }
 
-const {newrefreshToken,accessToken} = await generateAcesstokenandRefreshtoken(userValid._id)
-
-return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",newrefreshToken,options).json(
+return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",newRefreshToken,options).json(
   new ApiResponce(
     200, {
-      accessToken,refreshToken:newrefreshToken
+      accessToken,refreshToken:newRefreshToken
     },
     "Access token refreshed"
   )
@@ -187,11 +196,11 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
 })
 
   const changecurrentPassword = asyncHandler(async(req,res) => {
-    const {oldPassword,newPassword,conformPassword} = req.body
+    const {oldPassword,newPassword} = req.body
 
-    if(newPassword !== conformPassword){
-      throw new ApiError("400,not matching the password")
-    }
+    // if(newPassword !== conformPassword){
+    //   throw new ApiError("400,not matching the password")
+    // }
 
     const userValidity = await user.findById(req.user?._id)
 
@@ -200,7 +209,7 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
   if(!isPasswordCorrect){
     throw new ApiError(400,"wrong password")
   }
-  userValidity = newPassword
+  userValidity.password = newPassword
 
   userValidity.save({validateBeforeSave:false})
 
@@ -208,7 +217,7 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
   })
 
   const currentUser = asyncHandler(async(req,res) => {
-    return res.status.json(200,req.user, "current user fetched successful")
+    return res.status(200).json(new ApiResponce(200,req.user, "current user fetched successful"))
   })
 
   const updateuserDetail = asyncHandler(async(req,res) => {
@@ -250,7 +259,7 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
  const UserUpload = await user.findByIdAndUpdate(req.user?._id,
   {
    $set: {
-    avatar:avatar.url
+    avatar:uploadAvtare.url
    }
   },
   {

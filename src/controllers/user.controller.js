@@ -130,7 +130,9 @@ const logoutUser = asyncHandler(async (req,res) => {
  await user.findByIdAndUpdate(
   req.user._id, {
     $set: {
-      refreshToken:null
+      $unset:{
+        refreshToken:""
+      }
     }
   },
   {
@@ -288,7 +290,7 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
     const uploadCoverUser = await user.findByIdAndUpdate(req.user?._id,
       {
         $set:{
-          coverImage:coverImage.url
+          coverImage:uploading.url
         }
       },
       {
@@ -300,7 +302,7 @@ return res.status(200).cookie("accessToken",accessToken,options).cookie("refresh
   })
 
   const getUserChannelProfile = asyncHandler(async(req,res) => {
-    const {username} = req.parms
+    const {username} = req.params
 
     if(!username?.trim()){
       throw new ApiError(400,"username is not found")
@@ -338,7 +340,7 @@ const channel = await user.aggregate([
           },
           isSubscribed:{
            $cond:{
-            if:{$in: [req.user?._id,"subscribers.subscriber"]},
+            if:{$in: [req.user?._id,"$subscribers.subscriber"]},
             then:true,
             else:false
            }

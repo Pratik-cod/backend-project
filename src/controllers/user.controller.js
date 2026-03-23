@@ -5,7 +5,6 @@ import { uploadCloudinary } from '../service/cloudinary.js'
 import { ApiResponce } from '../utils/apiResponce.js'
 import Jwt from 'jsonwebtoken'
 import mongoose from 'mongoose'
-import {v2 as cloudinary} from 'cloudinary'
 
 const generateAcesstokenandRefreshtoken = async (userid) => {
   try {
@@ -418,26 +417,8 @@ const channel = await user.aggregate([
     )
   })
 
-  const videofile = asyncHandler(async(req,res) => {
-
-    const localPath = req.files?.video[0]?.path
-
-    if(!localPath){
-      throw new ApiError(400,"video file is required")
-    }
-
-    const uploadVideo = await uploadCloudinary(localPath)
-
-    if(!uploadVideo?.url){
-      throw new ApiError(400,"video file is required")
-    }
-
-    res.status(200).json(
-      new ApiResponce(200,uploadVideo,"video file upload successfully")
-    )
-
-    })
-export { registerUser, loginUser,logoutUser,refreshaccessToken,changecurrentPassword,currentUser,updateuserDetail,updatecoverImage,updateAvatar,getUserChannelProfile,getWatchHistory,videofile }
+ 
+export { registerUser, loginUser,logoutUser,refreshaccessToken,changecurrentPassword,currentUser,updateuserDetail,updatecoverImage,updateAvatar,getUserChannelProfile,getWatchHistory }
 
 //req body se mera data leke aao
 //frontend se data lo pahle

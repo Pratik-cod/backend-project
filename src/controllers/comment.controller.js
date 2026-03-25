@@ -61,8 +61,8 @@ const updatecomment = await Comment.findOneAndUpdate(
     if(!commentId){
         throw new ApiError(400,"commentId is required")
     }
-    if(!req.user || req.user._id ){
-        throw new ApiError(400,"unauthorized")
+    if(!req.user || !req.user._id ){
+        throw new ApiError(400,"unauthorized user")
     }
 
     const deleteComment = await Comment.findOneAndDelete(

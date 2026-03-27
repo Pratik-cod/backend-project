@@ -1,13 +1,36 @@
-steps of project:
+# Backend Project (Video, Tweet & Playlist API)
 
-1.iam accept the data from frontend.
-2.checking the data is valid.
-3.required the avater and username,password,email,
-4.compare the email its unique or not that unique then next process but its not unique then its email its used send message like username
-5.then unique identify then cloudinary send the image using multer that the user its identify like rpatik the pratik upload.
+## 📌 Overview
+Ye project ek **Node.js + Express + MongoDB** based backend hai jisme user authentication, media handling, playlist management, aur tweet/comment system implement kiya gaya hai. Cloudinary ka use kiya gaya hai avatar aur coverImage ke liye.
 
-unset vs undefined vs null data base se logout ke liye
+## 🚀 Features
+- **User Controller**
+  - JWT Authentication (Login/Signup)
+  - Avatar & Cover Image upload (Cloudinary)
+  - Aggregation pipeline & sub-pipeline for analytics
 
-undefined: ye koi bhi user ko sirf ignore karta hai na ki remove
-null:null value khali karta hai naki remove
-$unset:ye operator user ko remove karta hai isse database jyda heavy nahi hota
+- **Playlist Controller**
+  - Create playlist
+  - Add video to playlist
+  - Delete video from playlist
+  - Delete playlist
+
+- **Tweet/Comment Controller**
+  - Create tweet
+  - Delete tweet
+  - Like/Unlike tweet
+  - Comment system with like/dislike
+
+- **Video Controller**
+  - Upload video
+  - Delete video
+  - Like/Unlike video
+
+## 🛠️ Tech Stack
+- **Backend Framework**: Node.js + Express
+- **Database**: MongoDB (Mongoose)
+- **Authentication**: JWT
+- **Media Storage**: Cloudinary
+- **Other**: Aggregation Pipeline for analytics
+
+## 📂 Project Structure

@@ -24,6 +24,24 @@ const createTweet = asyncHandler(async(req,res) => {
     res.status(200).json(new ApiResponce(200,createTweet,"Tweet creation successfully"))
 })
 
+const getUserTweet = asyncHandler(async(req,res) => {
+    const {userId} = req.params
+
+    if(!userId){
+        throw new ApiError(400,"unauthorized")
+    }
+
+    const UserTweet = await tweet.find({owner:userId})
+
+    if(!UserTweet){
+   throw new ApiError(400,"User tweets are not found ")
+    }
+    res.status(200).json(new ApiResponce(200,UserTweet,"User tweets are found"))
+
+})
+
 export {
-    createTweet
+    createTweet,
+    getUserTweet
 }
+

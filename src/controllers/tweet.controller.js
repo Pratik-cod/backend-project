@@ -25,7 +25,7 @@ const createTweet = asyncHandler(async(req,res) => {
 })
 
 const getUserTweet = asyncHandler(async(req,res) => {
-    const {userId} = req.params
+    const userId = req.user._id
 
     if(!userId){
         throw new ApiError(400,"unauthorized")
@@ -40,8 +40,35 @@ const getUserTweet = asyncHandler(async(req,res) => {
 
 })
 
+const UpdateTweet = asyncHandler(async(req,res) => {
+    const {tweetId} = req.params 
+    const {content} = req.body
+
+    if(!tweetId){
+        throw new ApiError(400,"tweetId is required")
+    }
+    if(!content || !content.trim()){
+        throw new ApiError(400,"content is required")
+    }
+    const updatingTweet = await tweet.findByIdAndUpdate(tweetId,
+        {
+            content:content
+        },
+        {
+            new:true
+        }
+    )
+    if(!updatingTweet){
+        throw new ApiError(400,"updating tweet is failed")
+    }
+
+    res.status(200).json(new ApiResponce(200,updatingTweet," tweets update successful"))
+
+})
+
 export {
     createTweet,
-    getUserTweet
+    getUserTweet,
+    UpdateTweet
 }
 

@@ -1,6 +1,8 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/apiError";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/apiError.js";
 import {Comment} from "../models/comments.model.js"
+import { ApiResponce } from "../utils/apiResponce.js";
+import { user } from "../models/User.model.js";
 
 
 const addComment = asyncHandler(async(req,res) => {
@@ -11,31 +13,33 @@ const addComment = asyncHandler(async(req,res) => {
         throw new ApiError(400,"the comment is required")
     }
     if(!videoId){
-        throw new ApiError(400,"the comment is required")
+        throw new ApiError(400,"the video is required")
     }
 const getComments = await Comment.create({
     comment,
     video:videoId,
-    owner:req.user?._id
+    owner:req.user._id
 })
 
 if(!getComments){
     throw new ApiError(400,"the comment not create propely")
 }
+
+ res.status(200).json(new ApiResponce(201,getComments,"comment successfully added"))
 })
 
- const updateComment = asyncHandler(async(req,res) => {
+ const updateComments = asyncHandler(async(req,res) => {
     const {commentId} = req.params
     const {comment} = req.body
 
 if(!commentId){
     throw new ApiError(400,"commentId is required")
 }
-if(!comment || comment.trim()){
+if(!comment){
     throw new ApiError(400,"comment is not found")
 }
    
-if(!req.user || req.user._id){
+if(!req.user || !req.user._id){
     throw new ApiError("unauthorized user")
 }
 
@@ -52,10 +56,11 @@ const updatecomment = await Comment.findOneAndUpdate(
         runValidators:true
     }
 )
+ res.status(200).json(new ApiResponce(201,updatecomment,"comment successfully updated"))
 
  })
 
- const deleteComment = asyncHandler(async (req,res) => {
+ const deleteComments = asyncHandler(async (req,res) => {
     const {commentId} = req.params
 
     if(!commentId){
@@ -75,8 +80,59 @@ const updatecomment = await Comment.findOneAndUpdate(
     if(!deleteComment){
         throw new ApiError("comment not found")
     }
+     res.status(200).json(new ApiResponce(201,deleteComment,"comment successfully deleted"))
  })
 
- export {
-    addComment,updateComment,deleteComment
+ const getVideoComments = asyncHandler(async(req,res) => {
+    const UserId = req.user._id
+    let {page = 1, limit = 10} = req.query
+
+    page = parseInt(page)
+    limit = parseInt(limit)
+
+    if(!UserId){
+        throw new ApiError(400,"unauthorized")
+    }
+
+    const getvideocomment = await Comment.find({owner:UserId}).sort({createdAt:-1})
+    .skip((page - 1)*limit)
+    .limit(limit)
+    .populate("comment")
+
+     if(!getvideocomment){
+  throw new ApiError(400,"comment not found")
  }
+
+ res.status(200).json(new ApiResponce(201,getvideocomment,"all video comment fetched successfully"))
+
+ })
+
+
+
+ export {
+    addComment,updateComments,deleteComments,getVideoComments
+ }
+//approach not be proper because two db calls
+ //     if(!commentId){
+//         throw new ApiError(400,"the comment is not available")
+//     }
+//     if(!comment){
+//         throw new ApiError(400,"the comment is not available")
+//     }
+
+// const existingUser = await Comment.findById(commentId)
+
+// if(!existingUser){
+//     throw new ApiError(400,"unauthorized")
+// }
+// if(existingUser.owner.toString() !== req.user._id.toString()){
+//     throw new ApiError(400,"unauthorized")
+// }
+ // const updateComment = await Comment.findByIdAndUpdate(commentId,
+    //     {
+    //     comment:comment
+    //     },
+    //     {
+    //         new:true
+    //     }
+    // )

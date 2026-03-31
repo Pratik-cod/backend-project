@@ -15,9 +15,16 @@ app.use(cookieParser())//its using for the curd operation
 
 //Router
 import userRouter from './routes/user.route.js'
+import videoRouter from './routes/video.route.js'
+import likeRouter from './routes/like.route.js'
+import commentRouter from './routes/comment.route.js'
+import playlistRouter from './routes//playlist.route.js'
 
 app.use("/api/v1/users",userRouter)
 //https://localhost:8000/api/v1/users
-
+app.use("/api/v1/videos", videoRouter)
+app.use("/api/v1/likes", likeRouter);
+app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/playlist",playlistRouter)
 
 export {app}

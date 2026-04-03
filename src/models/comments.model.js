@@ -18,4 +18,4 @@ video:{
 
 commentSchema.plugin(mongooseaggregatepaginate)
 
-export const comment = mongoose.model("comment",commentSchema)
+export const Comment = mongoose.model("Comment",commentSchema)

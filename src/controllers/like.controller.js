@@ -122,6 +122,28 @@ const userId = req.user._id
     .json(new ApiResponce(200, "Tweet liked successfully", newLike, true));
 })
 
+const getLikeVideo = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
 
+  let { page = 1, limit = 10 } = req.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  const likedvideo = await like.find({ likeby: userId })
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate("video");  // schema mein field ka naam "video" hai
+
+  if (!likedvideo.length) {
+    return res.status(200).json(
+      new ApiResponce(200, [], "No liked videos found")
+    );
+  }
+
+  res.status(200).json(
+    new ApiResponce(200, likedvideo, "All liked videos are here")
+  );
+});
 export { toggleVideoLike,commentLikeToggle,TweetLiketoggle,getLikeVideo };
 

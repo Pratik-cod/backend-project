@@ -84,6 +84,32 @@ console.log(videoId,playlistId);
     res.status(200).json(new ApiResponce(200,addingvideo,"add video successfully"))
 })
 
+const removePlaylistVideo = asyncHandler(async(req,res) => {
+    const {playlistId,videoId} = req.params
+
+     if(!playlistId){
+        throw new ApiError(401,"playlist is not found")
+    }
+    if(!videoId){
+         throw new ApiError(401,"video is not found")
+    }
+    console.log(playlistId,videoId);
+    
+   const removevideo = await Playlist.findByIdAndUpdate(playlistId,
+    {
+     $pull:{videos:videoId}
+    },
+    {
+        new:true
+    }
+   )
+   if(!removevideo){
+    throw new ApiError(402,"video remove failed")
+   }
+   res.status(200).json(new ApiResponce(200,removevideo,"video remove successfully"))
+})
+
+
 
 export {
     createPlaylist,getPlaylistByIdUser,getplaylistId,addvideoAtPlaylist,updatePlaylit,removePlaylistVideo,deletePlaylist

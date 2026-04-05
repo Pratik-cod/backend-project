@@ -57,6 +57,32 @@ const getplaylistId = asyncHandler(async(req,res) => {
     }
     res.status(200).json(new ApiResponce(200,getPlaylist,"playlist is found"))
 })
+const addvideoAtPlaylist = asyncHandler(async(req,res) => {
+    const {playlistId,videoId} = req.params
+    // const {video} = req.body
+
+    if(!playlistId){
+        throw new ApiError(401,"playlist is not found")
+    }
+    if(!videoId){
+         throw new ApiError(401,"video is not found")
+    }
+console.log(videoId,playlistId);
+
+   const addingvideo = await Playlist.findByIdAndUpdate(playlistId,
+    {
+      $push:{videos:videoId}
+    },
+    {
+        new:true
+    }
+   )
+    if(!addingvideo){
+        throw new ApiError(403,"video adding failed")
+    }
+
+    res.status(200).json(new ApiResponce(200,addingvideo,"add video successfully"))
+})
 
 
 export {

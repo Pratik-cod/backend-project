@@ -29,6 +29,88 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserChannelsubscibers = asyncHandler(async(req,res) => {
+    const {channelId} = req.params
+    let {page = 1,limit = 10} = req.query
+    
+page = parseInt(page)
+limit = parseInt(limit)
+
+  const subscribers = await subscription.aggregate([
+    
+{$match:{
+    channel: new mongoose.Types.ObjectId(channelId)
+}},
+
+ {$skip:(page -1)*limit},
+{$limit:limit},
+
+    {
+        $lookup:{
+            from:"users",
+            localField:"subscriber",
+            foreignField:"_id",
+            as:"userdetail"
+        }   
+    },
+    {
+        $unwind:"$userdetail"
+    },
+   
+    {
+        $project:{
+            _id:0,
+            id:"$userdetail._id",
+            email:"$userdetail.email",
+            name:"$userdetail.username"
+        }
+    }
+
+  ])
+  res.status(200).json(new ApiResponce(200,subscribers,"subscribers are here"))
+})
+
+const getSubscribedChannels = asyncHandler(async (req, res) => {
+
+    const { subscriberId } = req.params
+    let {page = 1,limit = 10} = req.query
+  
+    page = parseInt(page)
+    limit = parseInt(limit)
+
+    const getsubsciber = await subscription.aggregate([
+        {
+            $match:{
+                subscriber:new mongoose.Types.ObjectId(subscriberId)
+            }
+        },
+        {
+            $skip:(page - 1)*limit
+        },
+        {
+            $limit:limit
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"channel",
+                foreignField:"_id",
+                as:"channeldetail"
+            }
+        },
+        {$unwind:"$channeldetail"},
+        {
+            $project:{
+                 _id: 0,
+                channelId: "$channeldetail._id",
+                name: "$channeldetail.username",
+                email: "$channeldetail.email"
+            }
+        }
+    ])
+    res.status(200).json(new ApiResponce(200,getsubsciber,"get subscribedChannels successfully"))
+})
+
 export {
     toggleSubscription,getSubscribedChannels,getUserChannelsubscibers
 }
